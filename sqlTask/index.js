@@ -79,9 +79,9 @@ class empCRUD {
         return this.connection.query(roleIDSql, [role]);
     }
 
-    updateRole(empID,roleID) {
+    updateRole(empID, roleID) {
         var updateRoleSql = "update employee set role_id = ? where id = ?;"
-        return this.connection.query(updateRoleSql, [empID, roleID]);
+        return this.connection.query(updateRoleSql, [roleID, empID]);
     }
 
     // List All Roles

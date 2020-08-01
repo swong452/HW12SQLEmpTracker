@@ -188,16 +188,15 @@ async function updateRole() {
 
     // List out the emp that needs role to be updated:
     const empList = await db.getEmpID();
-    console.log("get emp id :", empList);
+    //console.log("get emp id :", empList);
 
     // Create a current emp List array 
     const empChoice = empList.map(({first_name, last_name, id }) => ({
-        fname: first_name,
-        lname: last_name,
+        name: `${first_name} ${last_name}`,
         value: id
     }));
 
-    console.log("Newly created empChoice", empChoice);
+    //console.log("Newly created empChoice", empChoice);
 
     // Create an object empData that ask which emp you want role update ?
     const empData = await prompt([
@@ -215,7 +214,7 @@ async function updateRole() {
     // convert previously created department object, into new array that
     // only has 2 x kv pair. Such that, this new arry used in inquirer prompt
     const roleChoice = roleList.map(({ id, title }) => ({
-        role: title,
+        name: title,
         value: id
     }));
 
