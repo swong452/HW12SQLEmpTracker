@@ -10,9 +10,9 @@ async function startMenu() {
         {
             type: "list",
             name: "selection",
-            choices: ["Add Employee", "Remove Employee", "Update Employee",
-                "View Employee", "Add Department", "Remove Department", "View All Department",
-                "Add Role", "Remove Role", "View All Roles", "Quit"],
+            choices: ["Add Employee", "Remove Employee", "Update Employee Manager",
+                "View Employee", "Add Department", "Remove Department", "View Departments",
+                "Add Role", "Remove Role", "View Roles", "Update Role", "Quit"],
             message: "Please choose one option"
         }).then(function (choice) {
 
@@ -21,14 +21,20 @@ async function startMenu() {
                     return empInfo();  // Start to add dept, then will call addRole() and addEmp()
                 case "Remove Employee":
                     return removeEmp();
-                case "Update Employee":
+                case "Update Employee Manager":
                     return updateEmp();
                 case "View Employee":
-                    return viewEmpScreen(); // View by Emp Manager
+                    return viewEmp();
                 case "Add Role":
-                    return addNewRole(); // View by Emp Manager
+                    return addNewRole();
+                case "View Roles":
+                    return viewRoles();
+                case "Update Role":
+                    return updateRole();
                 case "Add Department":
-                    return addNewDept(); // View by Emp Manager
+                    return addNewDept();
+                case "View Departments":
+                    return viewDept();
                 default:
                     return quit();
             }
@@ -68,6 +74,25 @@ async function empInfo() {
     }) // end .then
 } // end addDept
 
+
+// Add a new Dept Without adding new Emp
+async function addNewDept() {
+    console.log("Add Brand New Dept");
+
+    // Create an object roleData that has these fields: title, salary, and department
+    const deptData = await prompt([
+        {
+            name: "dept",
+            message: "What is the name of the new Department?"
+        }
+    ]);
+    console.log("New deptData obj: ", deptData);
+    var newDept = await db.addDept(deptData.dept);
+    startMenu();
+} // end addNewRole
+
+
+
 // Add a new role ONLY - not necessary add new emp
 async function addNewRole() {
     console.log("Add Brand New role");
@@ -103,8 +128,8 @@ async function addNewRole() {
     ]);
     console.log("New roleData obj: ", roleData);
     addRole(roleData, roleData.dept_id, false);
+} // end addNewRole
 
-}
 
 // Add existing OR New Title to the Role table from New Employee
 async function addRole(empData, deptID, newEmp = true) {
@@ -156,6 +181,65 @@ async function addEmp(empData, roleID) {
 }
 
 
+
+// Update an existing Title to the Roles available from row table
+async function updateRole() {
+    console.log("Update current role to a New role");
+
+    // List out the emp that needs role to be updated:
+    const empList = await db.getEmpID();
+    console.log("get emp id :", empList);
+
+    // Create a current emp List array 
+    const empChoice = empList.map(({first_name, last_name, id }) => ({
+        fname: first_name,
+        lname: last_name,
+        value: id
+    }));
+
+    console.log("Newly created empChoice", empChoice);
+
+    // Create an object empData that ask which emp you want role update ?
+    const empData = await prompt([
+        {
+            type: "list",
+            name: "emp_id",
+            message: "Which employee you want role updated ?",
+            choices: empChoice
+        }
+    ]);
+
+    // Create a current Role List array 
+    const roleList = await db.listAllRoles();
+
+    // convert previously created department object, into new array that
+    // only has 2 x kv pair. Such that, this new arry used in inquirer prompt
+    const roleChoice = roleList.map(({ id, title }) => ({
+        role: title,
+        value: id
+    }));
+
+    // Create an object roleData 
+    const roleData = await prompt([
+        {
+            type: "list",
+            name: "role_id",
+            message: "Which new role you like to assign ?",
+            choices: roleChoice
+        }
+    ]);
+    console.log("Choosen roleData obj: ", empData.emp_id, roleData.role_id);
+    var updateRole = await db.updateRole(empData.emp_id, roleData.role_id);
+    startMenu();
+
+} // end updateRole
+
+
+
+
+
+
+
 // removeEmp(): List out all Employee first
 // Then let user choose an employee, and delete
 async function removeEmp() {
@@ -166,12 +250,26 @@ async function removeEmp() {
     // Then, use await prompt, list out all choices
     // Once user selected, pass that user to next sql statement to remove.
 
-
 }
 
-async function viewEmpScreen() {
+
+async function viewDept() {
+    const deptList = await db.listAllDept();
+    console.table(deptList);
+    startMenu();
+}
+
+
+async function viewEmp() {
     const empList = await db.listAllEmp();
     console.table(empList);
+    startMenu();
+}
+
+
+async function viewRoles() {
+    const roleList = await db.listAllRoles();
+    console.table(roleList);
     startMenu();
 }
 

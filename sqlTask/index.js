@@ -10,6 +10,18 @@ class empCRUD {
         this.connection = connection;
     }
 
+    // Add New Employee
+    addEmp(fname, lname, roleID, mgrID) {
+        var insertSql = "insert into employee set first_name = ?, last_name = ?, role_id = ?, manager_id=?;"
+        return this.connection.query(insertSql, [fname, lname, roleID, mgrID]);
+    }
+
+    // Add New Employee
+    addEmpNoMgr(fname, lname, roleID) {
+        var insertSql = "insert into employee set first_name = ?, last_name = ?, role_id = ?;"
+        return this.connection.query(insertSql, [fname, lname, roleID]);
+    }
+
     // List all employee info 
     listAllEmp() {
         // Notice at the end , we rename the table name from employee to manager. If keep using employee.id = employee.manager_id
@@ -22,8 +34,14 @@ class empCRUD {
     listAllDept() {
         var listDeptSql = "select name, id from department;"
         return this.connection.query(listDeptSql);
-
     }
+
+    // Retrieve Emp ID , and names only
+    getEmpID() {
+        var empIDSql = "select first_name, last_name, id from employee;"
+        return this.connection.query(empIDSql);
+    }
+
 
     // Check if dept exists
     ifDeptExist(dept) {
@@ -61,18 +79,17 @@ class empCRUD {
         return this.connection.query(roleIDSql, [role]);
     }
 
-
-    // Add New Employee
-    addEmp(fname, lname, roleID, mgrID) {
-        var insertSql = "insert into employee set first_name = ?, last_name = ?, role_id = ?, manager_id=?;"
-        return this.connection.query(insertSql, [fname, lname, roleID, mgrID]);
+    updateRole(empID,roleID) {
+        var updateRoleSql = "update employee set role_id = ? where id = ?;"
+        return this.connection.query(updateRoleSql, [empID, roleID]);
     }
 
-    // Add New Employee
-    addEmpNoMgr(fname, lname, roleID) {
-        var insertSql = "insert into employee set first_name = ?, last_name = ?, role_id = ?;"
-        return this.connection.query(insertSql, [fname, lname, roleID]);
+    // List All Roles
+    listAllRoles() {
+        var listRolesSql = "select roles.id, roles.title, roles.salary, department.name as department from roles left join department on roles.department_id = department.id;"
+        return this.connection.query(listRolesSql);
     }
+
 
 
 
