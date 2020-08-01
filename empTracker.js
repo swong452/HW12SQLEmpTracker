@@ -22,7 +22,7 @@ async function startMenu() {
                 case "Remove Employee":
                     return removeEmp();
                 case "Update Employee Manager":
-                    return updateEmp();
+                    return updateMgr();
                 case "View Employee":
                     return viewEmp();
                 case "View Employee By Manager":
@@ -239,6 +239,45 @@ async function updateRole() {
     startMenu();
 
 } // end updateRole
+
+
+// Update an employee's Manger, to another new Manager
+// Basically update the employee mgr_id , to another employee ID that you select. 
+async function updateMgr() {
+    console.log("Update employee Manger");
+
+    // List out all employee
+    const empList = await db.listAllEmp();
+    //console.log("get emp id :", empList);
+
+    // Create a current emp List array 
+    const empChoice = empList.map(({ first_name, last_name, id }) => ({
+        name: `${first_name} ${last_name}`,
+        value: id
+    }));
+
+    // Create an object empData that ask which emp you want role update ?
+    const empData = await prompt([
+        {
+            type: "list",
+            name: "emp_id",
+            message: "Which employee would you like , to move to another new manager ?",
+            choices: empChoice
+        },
+        {
+            type: "list",
+            name: "newMgr_id",
+            message: "Which employee would you like to promot to the new Manager, of the previously choosen employee ?",
+            choices: empChoice
+        },
+    ]);
+
+    console.log("empData obj with new Manger is: ", empData);
+    var updateMgr = await db.updateMgr(empData.emp_id, empData.newMgr_id);
+    startMenu();
+
+} // end updateMgr
+
 
 
 

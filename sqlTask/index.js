@@ -26,9 +26,10 @@ class empCRUD {
     listAllEmp() {
         // Notice at the end , we rename the table name from employee to manager. If keep using employee.id = employee.manager_id
         // you will get an error "Not unique table/alias"
-        //var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id, manager.first_name as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id;"
-        var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id, concat(employee.first_name, \" \", employee.last_name) as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id order by employee.first_name;"
-
+       
+        //var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id, concat(manager.first_name, \" \", manager.last_name) as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id order by employee.first_name;"
+        var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id, concat(manager.first_name, \" \", manager.last_name) as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on employee.manager_id = manager.id order by employee.first_name;"
+       
         return this.connection.query(listEmp);
     }
 
@@ -43,6 +44,11 @@ class empCRUD {
     listEmpByMgr(mgr_id) {
         var listEmpByMgr = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id where employee.manager_id = ? order by employee.first_name;"
         return this.connection.query(listEmpByMgr, [mgr_id]);
+    }
+
+    updateMgr(empID, mgrID) {
+        var updateMgrSql = "update employee set manager_id = ? where id = ?;"
+        return this.connection.query(updateMgrSql, [mgrID, empID]);
     }
 
     // Retrieve Emp Name and ID only
