@@ -52,7 +52,8 @@ async function empInfo() {
         { type: "input", name: "dept", message: "What is new employee Dept ?" },
         { type: "input", name: "title", message: "What is new employee Title ?" },
         { type: "input", name: "salary", message: "What is new employee Salary ?" },
-        { type: "input", name: "manager", message: "What is new employee Manager (if no, hit enter) ?" }
+        { type: "input", name: "mgrFirstN", message: "What is new employee Manager first name (if no, hit enter) ?" },
+        { type: "input", name: "mgrlastN", message: "What is new employee Manager last name (if no, hit enter) ?" },
     ]).then(async function (empData) {
 
         //Add Dept if not exists
@@ -168,9 +169,15 @@ async function addRole(empData, deptID, newEmp = true) {
 async function addEmp(empData, roleID) {
     console.log("Add emp with these 2 x param:", empData, roleID);
 
-    // If empData.manager !="" Search for Mananger ID.
-    if (empData.manager.length > 0) {
-        var newEmp = await db.addEmp(empData.firstN, empData.lastN, roleID, mgrID);
+    // If empData.manager !="" Search for Manager ID.
+    if (empData.mgrFirstN.length > 0) {
+        const empIDArray = await db.getEmpID(empData.mgrFirstN, empData.mgrLastN);
+        console.log("employee ID array: ", empIDArray);
+        if (empIDArray.length > 0) {
+            // This manager actually exists with a valid employee id
+            var newEmp = await db.addEmp(empData.firstN, empData.lastN, roleID, empIDArray[0].id);
+        }
+        //var newEmp = await db.addEmp(empData.firstN, empData.lastN, roleID, mgrID);
     } else {
         // Else, default mgrID = Null.
         console.log("No Manager defined");
@@ -187,7 +194,7 @@ async function updateRole() {
     console.log("Update current role to a New role");
 
     // List out the emp that needs role to be updated:
-    const empList = await db.getEmpID();
+    const empList = await db.getEmpNameID();
     //console.log("get emp id :", empList);
 
     // Create a current emp List array 
@@ -195,8 +202,6 @@ async function updateRole() {
         name: `${first_name} ${last_name}`,
         value: id
     }));
-
-    //console.log("Newly created empChoice", empChoice);
 
     // Create an object empData that ask which emp you want role update ?
     const empData = await prompt([

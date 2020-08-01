@@ -26,8 +26,20 @@ class empCRUD {
     listAllEmp() {
         // Notice at the end , we rename the table name from employee to manager. If keep using employee.id = employee.manager_id
         // you will get an error "Not unique table/alias"
-        var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , manager.first_name as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id;"
+        var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id, manager.first_name as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id;"
         return this.connection.query(listEmp);
+    }
+
+    // Retrieve Emp Name and ID only
+    getEmpNameID() {
+        var empNameIDSql = "select first_name, last_name, id from employee;"
+        return this.connection.query(empNameIDSql);
+    }
+
+    // Retrieve Emp Name and ID only
+    getEmpID(fname, lname) {
+        var empIDSql = "select id from employee where first_name = ?;"
+        return this.connection.query(empIDSql, [fname]);
     }
 
     // ListAllDept
@@ -35,13 +47,6 @@ class empCRUD {
         var listDeptSql = "select name, id from department;"
         return this.connection.query(listDeptSql);
     }
-
-    // Retrieve Emp ID , and names only
-    getEmpID() {
-        var empIDSql = "select first_name, last_name, id from employee;"
-        return this.connection.query(empIDSql);
-    }
-
 
     // Check if dept exists
     ifDeptExist(dept) {
@@ -73,11 +78,24 @@ class empCRUD {
         return this.connection.query(insertSql, [role, salary, deptID]);
     }
 
-    // Retrieve role ID , so emp table use the same role ID
+    // Retrieve role ID from role table base on title
     getRoleID(role) {
         var roleIDSql = "select id from roles where title = ?;"
         return this.connection.query(roleIDSql, [role]);
     }
+
+    // Retrieve role ID base on employee ID
+    getRoleIDBaseEmpID(empID) {
+        var roleIDBaseEmpIDSql = "select id from employee where id = ?;"
+        return this.connection.query(roleIDBaseEmpIDSql, [empID]);
+    }
+
+    // Retrieve title base on role_id
+    getRole() {
+        var getRoleSql = "select title from employee where role_id = ?;"
+        return this.connection.query(getRoleSql);
+    }
+
 
     updateRole(empID, roleID) {
         var updateRoleSql = "update employee set role_id = ? where id = ?;"
