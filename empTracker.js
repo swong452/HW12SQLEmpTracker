@@ -11,7 +11,7 @@ async function startMenu() {
             type: "list",
             name: "selection",
             choices: ["Add Employee", "Remove Employee", "Update Employee Manager",
-                "View Employee", "Add Department", "Remove Department", "View Departments",
+                "View Employee", "View Employee By Manager", "Add Department", "Remove Department", "View Departments",
                 "Add Role", "Remove Role", "View Roles", "Update Role", "Quit"],
             message: "Please choose one option"
         }).then(function (choice) {
@@ -25,6 +25,8 @@ async function startMenu() {
                     return updateEmp();
                 case "View Employee":
                     return viewEmp();
+                case "View Employee By Manager":
+                    return viewEmpByMgr();
                 case "Add Role":
                     return addNewRole();
                 case "View Roles":
@@ -53,7 +55,7 @@ async function empInfo() {
         { type: "input", name: "title", message: "What is new employee Title ?" },
         { type: "input", name: "salary", message: "What is new employee Salary ?" },
         { type: "input", name: "mgrFirstN", message: "What is new employee Manager first name (if no, hit enter) ?" },
-        { type: "input", name: "mgrlastN", message: "What is new employee Manager last name (if no, hit enter) ?" },
+        { type: "input", name: "mgrLastN", message: "What is new employee Manager last name (if no, hit enter) ?" },
     ]).then(async function (empData) {
 
         //Add Dept if not exists
@@ -177,7 +179,7 @@ async function addEmp(empData, roleID) {
             // This manager actually exists with a valid employee id
             var newEmp = await db.addEmp(empData.firstN, empData.lastN, roleID, empIDArray[0].id);
         }
-        //var newEmp = await db.addEmp(empData.firstN, empData.lastN, roleID, mgrID);
+        startMenu();
     } else {
         // Else, default mgrID = Null.
         console.log("No Manager defined");
@@ -198,7 +200,7 @@ async function updateRole() {
     //console.log("get emp id :", empList);
 
     // Create a current emp List array 
-    const empChoice = empList.map(({first_name, last_name, id }) => ({
+    const empChoice = empList.map(({ first_name, last_name, id }) => ({
         name: `${first_name} ${last_name}`,
         value: id
     }));
@@ -270,6 +272,33 @@ async function viewEmp() {
     startMenu();
 }
 
+// List out all Empy by manager
+async function viewEmpByMgr() {
+    // List out all manager first
+    const mgrList = await db.listMgr();
+
+    // Create a current Mgr List array 
+    const mgrChoice = mgrList.map(({ first_name, last_name, id }) => ({
+        name: `${first_name} ${last_name}`,
+        value: id
+    }));
+    console.log("mgChoice:", mgrChoice);
+
+    // Create an object mgrData that ask which mgr you want to choose ?
+    const mgrData = await prompt([
+        {
+            type: "list",
+            name: "mgr_id",
+            message: "Which manager would you like to see, his/her team members ?",
+            choices: mgrChoice
+        }
+    ]);
+
+    // Find all the employee that has this Manager_id
+    const empMgrList = await db.listEmpByMgr(mgrData.mgr_id);
+    console.table(empMgrList);
+    startMenu();
+} // end viewEmpByMgr
 
 async function viewRoles() {
     const roleList = await db.listAllRoles();

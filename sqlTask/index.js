@@ -26,8 +26,23 @@ class empCRUD {
     listAllEmp() {
         // Notice at the end , we rename the table name from employee to manager. If keep using employee.id = employee.manager_id
         // you will get an error "Not unique table/alias"
-        var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id, manager.first_name as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id;"
+        //var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id, manager.first_name as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id;"
+        var listEmp = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id, concat(employee.first_name, \" \", employee.last_name) as manager from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id order by employee.first_name;"
+
         return this.connection.query(listEmp);
+    }
+
+    // List all managers where manager_id field is non zero
+    listMgr() {
+        var listMgr = "select first_name, last_name, id from employee where id = ANY \
+        (select manager_id from employee where manager_id is NOT NULL);"
+        return this.connection.query(listMgr);
+    }
+
+    // List all employee info by manager_id
+    listEmpByMgr(mgr_id) {
+        var listEmpByMgr = "select employee.id, employee.first_name, employee.last_name, roles.title, roles.salary, department.name as department , employee.manager_id from employee left join roles on employee.role_id  = roles.id left join department on roles.department_id = department.id left join employee manager on manager.id = employee.manager_id where employee.manager_id = ? order by employee.first_name;"
+        return this.connection.query(listEmpByMgr, [mgr_id]);
     }
 
     // Retrieve Emp Name and ID only
@@ -44,7 +59,7 @@ class empCRUD {
 
     // ListAllDept
     listAllDept() {
-        var listDeptSql = "select name, id from department;"
+        var listDeptSql = "select name, id from department order by name;"
         return this.connection.query(listDeptSql);
     }
 
@@ -104,7 +119,7 @@ class empCRUD {
 
     // List All Roles
     listAllRoles() {
-        var listRolesSql = "select roles.id, roles.title, roles.salary, department.name as department from roles left join department on roles.department_id = department.id;"
+        var listRolesSql = "select roles.id, roles.title, roles.salary, department.name as department from roles left join department on roles.department_id = department.id order by roles.title;"
         return this.connection.query(listRolesSql);
     }
 
