@@ -51,6 +51,11 @@ class empCRUD {
         return this.connection.query(updateMgrSql, [mgrID, empID]);
     }
 
+    deleteEmp(empID) {
+        var deleteEmpSql = "delete from employee where id = ?;"
+        return this.connection.query(deleteEmpSql, [empID]);
+
+    }
     // Retrieve Emp Name and ID only
     getEmpNameID() {
         var empNameIDSql = "select first_name, last_name, id from employee;"
@@ -81,10 +86,20 @@ class empCRUD {
         return this.connection.query(insertSql, [dept]);
     }
 
+    deleteDept(id) {
+        var deleteDeptSql = "delete from department where id = ?;"
+        return this.connection.query(deleteDeptSql, [id]);
+    }
+
+
     // Retrieve dept ID , so Roles table use the same dept ID 
     getDeptID(dept) {
         var deptIDSql = "select id from department where name = ?;"
         return this.connection.query(deptIDSql, [dept]);
+    }
+
+    getDeptBudget(deptID) {
+        var deptBgtSql = "select"
     }
 
     // check if current role exists
@@ -98,6 +113,12 @@ class empCRUD {
         var insertSql = "insert into roles set title = ?, salary = ?, department_id = ?;"
         return this.connection.query(insertSql, [role, salary, deptID]);
     }
+
+    deleteRole(role_ID) {
+        var deleteRoleSql = "delete from roles where id = ?;"
+        return this.connection.query(deleteRoleSql, [role_ID]);
+    }
+
 
     // Retrieve role ID from role table base on title
     getRoleID(role) {
@@ -128,11 +149,6 @@ class empCRUD {
         var listRolesSql = "select roles.id, roles.title, roles.salary, department.name as department from roles left join department on roles.department_id = department.id order by roles.title;"
         return this.connection.query(listRolesSql);
     }
-
-
-
-
-
 } // end Class
 
 // Here we initiated an instace of class empCURD by passing in the connection obj in
