@@ -5,17 +5,15 @@ create database employeeDB;
 use employeeDB;
 
 create table department (
-    id int not null auto_increment,
-    name varchar(30),
-    primary key (id)
+    id int not null auto_increment primary key,
+    name varchar(30) unique not null
 );
 
 create table roles (
-    id int unsigned auto_increment,
-    title varchar(30),
-    salary decimal (10,2),
-    department_id int,
-    primary key (id),
+    id int unsigned auto_increment primary key,
+    title varchar(30) unique not null,
+    salary decimal (10,2) unsigned not null,
+    department_id int unsigned not null,
     constraint dept_role_fk foreign key (department_id) references department (id) on delete cascade
 );
 
