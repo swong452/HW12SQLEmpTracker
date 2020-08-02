@@ -98,9 +98,18 @@ class empCRUD {
         return this.connection.query(deptIDSql, [dept]);
     }
 
-    getDeptBudget(deptID) {
-        var deptBgtSql = "select"
+    /*
+    getDeptBudget() {
+        var deptBgtSql = "SELECT department.id, department.name, SUM(roles.salary) AS Budget FROM employee LEFT JOIN roles on employee.role_id = roles.id LEFT JOIN department on roles.department_id = department.id GROUP BY department.id, department.name;"
+        return this.connection.query(deptBgtSql);
     }
+    */
+
+    getDeptBudget() {
+        var deptBgtSql = "SELECT department.id, department.name, SUM(roles.salary) AS Budget FROM department LEFT JOIN roles on department.id = roles.department_id LEFT JOIN employee on roles.id = employee.role_id GROUP BY department.id, department.name;"
+        return this.connection.query(deptBgtSql);
+    }
+
 
     // check if current role exists
     ifRoleExist(role) {

@@ -64,7 +64,7 @@ async function empInfo() {
 
         //Add Dept if not exists
         var dept = await db.ifDeptExist(empData.dept);
-        console.log("dept returned", dept);
+        
         if (dept.length > 0) {
             // As Dept already exists. No need to add new dept. Go to check role
             console.log("This dept already exists");
@@ -376,7 +376,8 @@ async function updateMgr() {
 
 
 async function viewDept() {
-    const deptList = await db.listAllDept();
+    // const deptList = await db.listAllDept();
+    const deptList = await db.getDeptBudget();
     console.table(deptList);
     startMenu();
 }
